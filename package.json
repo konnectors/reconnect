@@ -4,7 +4,7 @@
   "description": "",
   "repository": {
     "type": "git",
-    "url": "git@github.com:konnectors/template.git"
+    "url": "https://forge.grandlyon.com/rpailharey/reconnect-konnector.git"
   },
   "keywords": [],
   "author": "Cozy Cloud",
