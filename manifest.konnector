@@ -1,0 +1,49 @@
+{
+  "version": "1.0.0",
+  "name": "Reconnect",
+  "type": "konnector",
+  "language": "node",
+  "icon": "icon.png",
+  "slug": "reconnect-konnector",
+  "source": "git@github.com:konnectors/template.git",
+  "editor": "Rémi Pailharey",
+  "fields": {
+    "login": {
+      "type": "text"
+    },
+    "password": {
+      "type": "password"
+    },
+    "advancedFields": {
+      "folderPath": {
+        "advanced": true,
+        "isRequired": false
+      }
+    }
+  },
+  "data_types": [],
+  "screenshots": [],
+  "permissions": {"accounts": {
+      "type": "io.cozy.accounts"
+    },
+    "files": {
+      "type": "io.cozy.files"
+    }
+  },
+  "langs": ["fr"],
+  "locales": {
+    "fr": {
+      "short_description": "Récupère les documents d'un compte Reconnect",
+      "long_description": "Ce connecteur récupère les documents présents sur un cloud Reconnect",
+      "permissions": {
+        "accounts": {
+          "description": "Utilisé pour obtenir les données du compte"
+        },
+        "files": {
+          "description": "Utilisé pour sauvegarder des fichiers"
+        }
+      }
+    }
+  },
+  "manifest_version": "2"
+}
