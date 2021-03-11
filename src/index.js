@@ -1,9 +1,8 @@
 const {
-  cozyClient,
   BaseKonnector,
-  log,
   requestFactory,
-  saveFiles
+  saveFiles,
+  errors,
 } = require("cozy-konnector-libs");
 
 const request = requestFactory({
@@ -16,18 +15,18 @@ const request = requestFactory({
   // default in cozy-konnector-libs
   json: true,
   // This allows request-promise to keep cookies between requests
-  jar: true
+  jar: true,
 });
-
-const BASE_URL = "https://www.dev.reconnect.fr";
 
 async function start(fields, cozyParameters) {
   try {
+    const baseURL = cozyParameters.secret.reconnectBaseURL;
     const clientId = cozyParameters.secret.clientId;
     const clientSecret = cozyParameters.secret.clientSecret;
 
     await this.deactivateAutoSuccessfulLogin();
     access_token = await authenticate(
+      baseURL,
       fields.login,
       fields.password,
       clientId,
@@ -35,20 +34,26 @@ async function start(fields, cozyParameters) {
     );
     await this.notifySuccessfulLogin();
 
-    user = await getUser(access_token);
-    documents = await getDocuments(user.subject_id, access_token);
-    folders = await getFolders(user.subject_id, access_token);
+    user = await getUser(baseURL, access_token);
+    documents = await getDocuments(baseURL, user.subject_id, access_token);
+    folders = await getFolders(baseURL, user.subject_id, access_token);
     parsed_documents = await parseDocumentsFromFolders(documents, folders);
 
     await saveFiles(parsed_documents, fields);
   } catch (error) {
-    throw new Error(error.message);
+    throw error;
   }
 }
 
-async function authenticate(username, password, clientId, clientSecret) {
+async function authenticate(
+  baseURL,
+  username,
+  password,
+  clientId,
+  clientSecret
+) {
   const url =
-    BASE_URL +
+    baseURL +
     "/oauth/v2/token?grant_type=password&client_id=" +
     clientId +
     "&client_secret=" +
@@ -57,40 +62,61 @@ async function authenticate(username, password, clientId, clientSecret) {
     username +
     "&password=" +
     password;
-  response = await request(url);
-  return response.access_token;
+  try {
+    response = await request(url);
+    return response.access_token;
+  } catch (error) {
+    throw new Error(errors.LOGIN_FAILED);
+  }
 }
 
-async function getUser(access_token) {
-  const url = BASE_URL + "/api/user?" + "access_token=" + access_token;
-  user = await request(url);
-  return user;
+async function getUser(baseURL, access_token) {
+  const url = baseURL + "/api/user?" + "access_token=" + access_token;
+
+  try {
+    user = await request(url);
+    return user;
+  } catch (error) {
+    throw new Error(errors.VENDOR_DOWN)
+  }
 }
 
-async function getDocuments(beneficiary_id, access_token) {
+async function getDocuments(baseURL, beneficiary_id, access_token) {
   const url =
-    BASE_URL +
+    baseURL +
     "/api/v2/beneficiaries/" +
     beneficiary_id +
     "/documents?access_token=" +
     access_token;
-  documents = await request(url);
-  return documents;
+
+  try {
+    documents = await request(url);
+    return documents;
+  } catch (error) {
+    throw new Error(errors.VENDOR_DOWN)
+  }
+
 }
 
-async function getFolders(beneficiary_id, access_token) {
+async function getFolders(baseURL, beneficiary_id, access_token) {
   const url =
-    BASE_URL +
+    baseURL +
     "/api/v2/beneficiaries/" +
     beneficiary_id +
     "/folders?access_token=" +
     access_token;
-  folders = await request(url);
-  return folders;
+
+  try {
+    folders = await request(url);
+    return folders;    
+  } catch (error) {
+    throw new Error(errors.VENDOR_DOWN)
+  }
+
 }
 
 async function parseDocuments(documents) {
-  return documents.map(doc => {
+  return documents.map((doc) => {
     var parsed_doc = {};
     parsed_doc["filename"] = doc.nom;
     parsed_doc["fileurl"] = doc.url;
@@ -104,10 +130,10 @@ async function parseDocuments(documents) {
 async function parseDocumentsFromFolders(documents, folders) {
   let parsed_documents = await parseDocuments(documents);
 
-  parsed_documents.forEach(document => {
+  parsed_documents.forEach((document) => {
     let parentFolderId = document.folder_id;
     while (parentFolderId) {
-      let parentFolder = folders.find(folder => {
+      let parentFolder = folders.find((folder) => {
         return folder.id === parentFolderId;
       });
       document.subPath = parentFolder.nom + "/" + document.subPath;
