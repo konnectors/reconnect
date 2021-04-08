@@ -5,7 +5,7 @@
   "language": "node",
   "icon": "icon.png",
   "slug": "reconnect-konnector",
-  "source": "git@github.com:konnectors/template.git",
+  "source": "https://forge.grandlyon.com/rpailharey/reconnect-konnector.git",
   "editor": "Rémi Pailharey",
   "fields": {
     "login": {
@@ -30,17 +30,29 @@
       "type": "io.cozy.files"
     }
   },
-  "langs": ["fr"],
+  "langs": ["fr", "en"],
   "locales": {
     "fr": {
       "short_description": "Récupère les documents d'un compte Reconnect",
-      "long_description": "Ce connecteur récupère les documents présents sur un cloud Reconnect",
+      "long_description": "Ce connecteur récupère tout les documents présents sur un cloud Reconnect",
       "permissions": {
         "accounts": {
           "description": "Utilisé pour obtenir les données du compte"
         },
         "files": {
           "description": "Utilisé pour sauvegarder des fichiers"
+        }
+      }
+    },
+    "en": {
+      "short_description": "Fetch documents from a Reconnect account",
+      "long_description": "This konnector fetches all documents from a Reconnect's cloud",
+      "permissions": {
+        "accounts": {
+          "description": "Required to get the account's data"
+        },
+        "files": {
+          "description": "Required to save the files"
         }
       }
     }
