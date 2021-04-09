@@ -1,3 +1,7 @@
+process.env.SENTRY_DSN =
+  process.env.SENTRY_DSN ||
+  'https://1b0c32c864e543fd9dc10585dfd09ff2@sentry.cozycloud.cc/148'
+
 const {
   BaseKonnector,
   requestFactory,
@@ -108,7 +112,7 @@ async function getFolders(baseURL, beneficiary_id, access_token) {
 
   try {
     folders = await request(url);
-    return folders;    
+    return folders;
   } catch (error) {
     throw new Error(errors.VENDOR_DOWN)
   }
