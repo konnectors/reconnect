@@ -6,8 +6,8 @@ const {
   BaseKonnector,
   requestFactory,
   saveFiles,
-  errors,
-} = require("cozy-konnector-libs");
+  errors
+} = require('cozy-konnector-libs')
 
 const request = requestFactory({
   // The debug mode shows all the details about HTTP requests and responses. Very useful for
@@ -19,33 +19,33 @@ const request = requestFactory({
   // default in cozy-konnector-libs
   json: true,
   // This allows request-promise to keep cookies between requests
-  jar: true,
-});
+  jar: true
+})
 
 async function start(fields, cozyParameters) {
   try {
-    const baseURL = cozyParameters.secret.reconnectBaseURL;
-    const clientId = cozyParameters.secret.clientId;
-    const clientSecret = cozyParameters.secret.clientSecret;
+    const baseURL = cozyParameters.secret.reconnectBaseURL
+    const clientId = cozyParameters.secret.clientId
+    const clientSecret = cozyParameters.secret.clientSecret
 
-    await this.deactivateAutoSuccessfulLogin();
-    access_token = await authenticate(
+    await this.deactivateAutoSuccessfulLogin()
+    const access_token = await authenticate(
       baseURL,
       fields.login,
       fields.password,
       clientId,
       clientSecret
-    );
-    await this.notifySuccessfulLogin();
+    )
+    await this.notifySuccessfulLogin()
 
-    user = await getUser(baseURL, access_token);
-    documents = await getDocuments(baseURL, user.subject_id, access_token);
-    folders = await getFolders(baseURL, user.subject_id, access_token);
-    parsed_documents = await parseDocumentsFromFolders(documents, folders);
+    const user = await getUser(baseURL, access_token)
+    const documents = await getDocuments(baseURL, user.subject_id, access_token)
+    const folders = await getFolders(baseURL, user.subject_id, access_token)
+    const parsed_documents = await parseDocumentsFromFolders(documents, folders)
 
-    await saveFiles(parsed_documents, fields);
+    await saveFiles(parsed_documents, fields)
   } catch (error) {
-    throw error;
+    throw error
   }
 }
 
@@ -58,28 +58,28 @@ async function authenticate(
 ) {
   const url =
     baseURL +
-    "/oauth/v2/token?grant_type=password&client_id=" +
+    '/oauth/v2/token?grant_type=password&client_id=' +
     clientId +
-    "&client_secret=" +
+    '&client_secret=' +
     clientSecret +
-    "&username=" +
+    '&username=' +
     username +
-    "&password=" +
-    password;
+    '&password=' +
+    password
   try {
-    response = await request(url);
-    return response.access_token;
+    const response = await request(url)
+    return response.access_token
   } catch (error) {
-    throw new Error(errors.LOGIN_FAILED);
+    throw new Error(errors.LOGIN_FAILED)
   }
 }
 
 async function getUser(baseURL, access_token) {
-  const url = baseURL + "/api/user?" + "access_token=" + access_token;
+  const url = baseURL + '/api/user?' + 'access_token=' + access_token
 
   try {
-    user = await request(url);
-    return user;
+    const user = await request(url)
+    return user
   } catch (error) {
     throw new Error(errors.VENDOR_DOWN)
   }
@@ -88,63 +88,61 @@ async function getUser(baseURL, access_token) {
 async function getDocuments(baseURL, beneficiary_id, access_token) {
   const url =
     baseURL +
-    "/api/v2/beneficiaries/" +
+    '/api/v2/beneficiaries/' +
     beneficiary_id +
-    "/documents?access_token=" +
-    access_token;
+    '/documents?access_token=' +
+    access_token
 
   try {
-    documents = await request(url);
-    return documents;
+    const documents = await request(url)
+    return documents
   } catch (error) {
     throw new Error(errors.VENDOR_DOWN)
   }
-
 }
 
 async function getFolders(baseURL, beneficiary_id, access_token) {
   const url =
     baseURL +
-    "/api/v2/beneficiaries/" +
+    '/api/v2/beneficiaries/' +
     beneficiary_id +
-    "/folders?access_token=" +
-    access_token;
+    '/folders?access_token=' +
+    access_token
 
   try {
-    folders = await request(url);
-    return folders;
+    const folders = await request(url)
+    return folders
   } catch (error) {
     throw new Error(errors.VENDOR_DOWN)
   }
-
 }
 
 async function parseDocuments(documents) {
-  return documents.map((doc) => {
-    var parsed_doc = {};
-    parsed_doc["filename"] = doc.nom;
-    parsed_doc["fileurl"] = doc.url;
-    parsed_doc["folder_id"] = doc.folder_id;
-    parsed_doc["subPath"] = "";
+  return documents.map(doc => {
+    var parsed_doc = {}
+    parsed_doc['filename'] = doc.nom
+    parsed_doc['fileurl'] = doc.url
+    parsed_doc['folder_id'] = doc.folder_id
+    parsed_doc['subPath'] = ''
 
-    return parsed_doc;
-  });
+    return parsed_doc
+  })
 }
 
 async function parseDocumentsFromFolders(documents, folders) {
-  let parsed_documents = await parseDocuments(documents);
+  let parsed_documents = await parseDocuments(documents)
 
-  parsed_documents.forEach((document) => {
-    let parentFolderId = document.folder_id;
+  parsed_documents.forEach(document => {
+    let parentFolderId = document.folder_id
     while (parentFolderId) {
-      let parentFolder = folders.find((folder) => {
-        return folder.id === parentFolderId;
-      });
-      document.subPath = parentFolder.nom + "/" + document.subPath;
-      parentFolderId = parentFolder.dossier_parent_id;
+      let parentFolder = folders.find(folder => {
+        return folder.id === parentFolderId
+      })
+      document.subPath = parentFolder.nom + '/' + document.subPath
+      parentFolderId = parentFolder.dossier_parent_id
     }
-  });
-  return parsed_documents;
+  })
+  return parsed_documents
 }
 
-module.exports = new BaseKonnector(start);
+module.exports = new BaseKonnector(start)
