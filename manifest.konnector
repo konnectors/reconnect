@@ -7,6 +7,7 @@
   "slug": "reconnect",
   "source": "git@github.com:konnectors/reconnect.git",
   "editor": "Métropole de Lyon",
+  "vendor_link": "https://reconnect.fr",
   "fields": {
     "login": {
       "type": "text"
