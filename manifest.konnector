@@ -4,7 +4,7 @@
   "type": "konnector",
   "language": "node",
   "icon": "icon.png",
-  "slug": "reconnect-konnector",
+  "slug": "reconnect",
   "source": "git@github.com:konnectors/reconnect.git",
   "editor": "Métropole de Lyon",
   "fields": {
