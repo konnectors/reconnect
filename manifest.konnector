@@ -5,8 +5,8 @@
   "language": "node",
   "icon": "icon.png",
   "slug": "reconnect-konnector",
-  "source": "https://forge.grandlyon.com/rpailharey/reconnect-konnector.git",
-  "editor": "Rémi Pailharey",
+  "source": "git@github.com:konnectors/reconnect.git",
+  "editor": "Métropole de Lyon",
   "fields": {
     "login": {
       "type": "text"
