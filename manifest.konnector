@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.0.0",
   "name": "Reconnect",
   "type": "konnector",
   "language": "node",
@@ -24,18 +24,14 @@
   },
   "data_types": [],
   "screenshots": [],
-  "permissions": {
-    "accounts": {
+  "permissions": {"accounts": {
       "type": "io.cozy.accounts"
     },
     "files": {
       "type": "io.cozy.files"
     }
   },
-  "langs": [
-    "fr",
-    "en"
-  ],
+  "langs": ["fr", "en"],
   "locales": {
     "fr": {
       "short_description": "Récupère les documents d'un compte Reconnect",
